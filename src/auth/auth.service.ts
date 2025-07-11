@@ -11,7 +11,8 @@ import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { AdminService } from "../admin/admin.service";
 import { LoginAdminDto } from "../admin/dto/login-admin.dto";
 import * as bcrypt from "bcrypt";
-import { Response } from "express";
+import * as jwt from "jsonwebtoken";
+import { Request, Response } from "express";
 
 @Injectable()
 export class AuthService {
@@ -28,12 +29,12 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: process.env.ACCESS_TOKEN_KEYAdmin,
-        expiresIn: process.env.SECRET_TOKEN_TIMEAdmin,
+        secret: process.env.ACCESS_TOKEN_SECRET,
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
       }),
       this.jwtService.signAsync(payload, {
-        secret: process.env.REFRESH_TOKEN_KEYAdmin,
-        expiresIn: process.env.REFRESH_TOKEN_TIMEAdmin,
+        secret: process.env.REFRESH_TOKEN_SECRET,
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
       }),
     ]);
 
@@ -81,11 +82,103 @@ export class AuthService {
 
     await admin.save();
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refresh_token", refreshToken, {
       maxAge: +process.env.COOKIE_TIME!,
       httpOnly: true,
     });
 
     return { message: "User signed in 🎉", adminId: admin._id, accessToken };
+  }
+
+  async logoutAdmin(req: Request, res: Response) {
+    try {
+      const refresh_token = req.cookies.refresh_token;
+      if (!refresh_token) {
+        throw new BadRequestException("Refresh token is required");
+      }
+      const decoded: any = jwt.verify(
+        refresh_token,
+        process.env.REFRESH_TOKEN_SECRET!
+      );
+      const admin = await this.adminService.findOne(decoded.id);
+
+      if (!admin || !admin.hashed_refresh_token) {
+        throw new UnauthorizedException("Admin has no refresh token");
+      }
+      const isMatch = await bcrypt.compare(
+        refresh_token,
+        admin.hashed_refresh_token
+      );
+      if (!isMatch) {
+        throw new UnauthorizedException("Invalid token");
+      }
+      admin.hashed_refresh_token = "";
+      await admin.save();
+      res.clearCookie("refresh_token", {
+        httpOnly: true,
+      });
+
+      return { message: "Logged out successfully" };
+    } catch (error) {
+      console.error("Signout error:", error);
+      throw new UnauthorizedException("Error occurred during logout");
+    }
+  }
+
+  async refreshAdminToken(req: Request, res: Response) {
+    const refresh_token = req.cookies?.refresh_token;
+
+    if (!refresh_token) {
+      throw new BadRequestException("Refresh token is required");
+    }
+    let decoded: any;
+    try {
+      decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET!);
+    } catch (err) {
+      throw new UnauthorizedException("Invalid or expired refresh token");
+    }
+
+    const admin = await this.adminService.findOne(decoded.id);
+
+    if (!admin || !admin.hashed_refresh_token) {
+      throw new UnauthorizedException("User not found or token missing");
+    }
+
+    const isMatch = await bcrypt.compare(
+      refresh_token,
+      admin.hashed_refresh_token
+    );
+    if (!isMatch) {
+      throw new UnauthorizedException("Token mismatch");
+    }
+
+    const payload = { id: admin.id };
+    const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN!,
+    });
+
+    const newRefreshToken = jwt.sign(
+      payload,
+      process.env.REFRESH_TOKEN_SECRET!,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN!,
+      }
+    );
+
+    const hashedNewRefresh = await bcrypt.hash(newRefreshToken, 7);
+    admin.hashed_refresh_token = hashedNewRefresh;
+    await admin.save();
+
+    res.cookie("refresh_token", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: +process.env.COOKIE_TIME!,
+    });
+
+    return {
+      message: "Admin accessToken refreshed",
+      access_token: newAccessToken,
+    };
   }
 }
