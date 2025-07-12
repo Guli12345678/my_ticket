@@ -11,6 +11,8 @@ import { LangModule } from './lang/lang.module';
 import { TypesModule } from './types/types.module';
 import { RegionModule } from './region/region.module';
 import { SeatTypeModule } from './seat_type/seat_type.module';
+import { CustomersModule } from './customers/customers.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { SeatTypeModule } from './seat_type/seat_type.module';
     TypesModule,
     RegionModule,
     SeatTypeModule,
+    CustomersModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],
