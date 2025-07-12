@@ -18,7 +18,7 @@ import { MailService } from "./mail.service";
           },
         },
         defaults: {
-          from: `"My Ticket" <${config.get<string>("smtp_user")}>`,
+          from: `"my_ticket" <${config.get<string>("smtp_user")}>`,
         },
         template: {
           dir: join(__dirname, "templates"),

@@ -7,4 +7,5 @@ export class CreateCustomerDto {
   gender: string;
   password: string;
   confirm_password: string;
+  activation_link: string;
 }

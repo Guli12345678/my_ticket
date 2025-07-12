@@ -242,7 +242,7 @@ export class AuthService {
 
     if (!customer) {
       throw new UnauthorizedException(
-        "This admin does not exist. Check your email and password"
+        "This customer does not exist. Check your email and password"
       );
     }
 

@@ -1,17 +1,28 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateCustomerDto } from "./dto/create-customer.dto";
 import { UpdateCustomerDto } from "./dto/update-customer.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Customer } from "./entities/customer.entity";
 import { Model } from "mongoose";
+import * as bcrypt from "bcrypt";
+
 
 @Injectable()
 export class CustomersService {
   constructor(
     @InjectModel(Customer.name) private readonly customerModel: Model<Customer>
   ) {}
-  create(createCustomerDto: CreateCustomerDto) {
-    return this.customerModel.create(createCustomerDto);
+  async create(createCustomerDto: CreateCustomerDto) {
+    const { password, confirm_password } = createCustomerDto;
+    if (password !== confirm_password) {
+      throw new BadRequestException("Parollar mos emas!");
+    }
+
+    const hashed_password = await bcrypt.hash(password, 7);
+    return this.customerModel.create({
+      ...createCustomerDto,
+      hashed_password,
+    });
   }
 
   findAll() {
