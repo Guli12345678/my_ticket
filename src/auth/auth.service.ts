@@ -12,13 +12,19 @@ import { CreateAdminDto } from "../admin/dto/create-admin.dto";
 import { AdminService } from "../admin/admin.service";
 import { LoginAdminDto } from "../admin/dto/login-admin.dto";
 import * as bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
 import * as jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { CustomersService } from "../customers/customers.service";
-import { CustomerDocument } from "../customers/entities/customer.entity";
+import {
+  Customer,
+  CustomerDocument,
+} from "../customers/entities/customer.entity";
 import { CreateCustomerDto } from "../customers/dto/create-customer.dto";
 import { LoginCustomerDto } from "../customers/dto/login-customer.dto";
 import { MailService } from "../mail/mail.service";
+import { Model } from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
 
 @Injectable()
 export class AuthService {
@@ -26,6 +32,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly adminService: AdminService,
     private readonly customerService: CustomersService,
+    @InjectModel(Customer.name) private readonly customerModel: Model<Customer>,
     private readonly mailService: MailService
   ) {}
   async generateTokensAdmin(admin: AdminDocument) {
@@ -219,9 +226,10 @@ export class AuthService {
     );
 
     if (candidate) {
-      throw new ConflictException("This admin already exists in the system");
+      throw new ConflictException("This customer already exists in the system");
     }
 
+    createCustomerDto.activation_link = uuidv4();
     const newCustomer = await this.customerService.create(createCustomerDto);
 
     try {
@@ -362,5 +370,28 @@ export class AuthService {
       message: "Customer accessToken refreshed",
       access_token: newAccessToken,
     };
+  }
+
+  async activateUser(activationLink: string) {
+    if (!activationLink) {
+      throw new UnauthorizedException("Activation link is required");
+    }
+
+    const user = await this.customerModel.findOne({
+      activation_link: activationLink,
+    });
+
+    if (!user) {
+      throw new NotFoundException("Invalid activation link");
+    }
+
+    if (user.is_active) {
+      throw new ConflictException("User account is already activated");
+    }
+
+    user.is_active = true;
+    await user.save();
+
+    return { message: "User account activated successfully" };
   }
 }

@@ -15,6 +15,6 @@ import { Customer, CustomerSchema } from "./entities/customer.entity";
   ],
   controllers: [CustomersController],
   providers: [CustomersService],
-  exports: [CustomersService],
+  exports: [CustomersService, MongooseModule],
 })
 export class CustomersModule {}
