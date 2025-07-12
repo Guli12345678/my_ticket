@@ -14,7 +14,7 @@ export class MailService {
     };
     await this.mailerService.sendMail({
       to: customer.email,
-      subject: "welcome to My Ticket",
+      subject: "Welcome to My Ticket",
       html: `<html lang="en">
   <head>
     <meta charset="UTF-8" />
