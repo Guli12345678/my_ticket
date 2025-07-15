@@ -13,6 +13,14 @@ import { RegionModule } from './region/region.module';
 import { SeatTypeModule } from './seat_type/seat_type.module';
 import { CustomersModule } from './customers/customers.module';
 import { MailModule } from './mail/mail.module';
+import { DistrictModule } from './district/district.module';
+import { VenueModule } from './venue/venue.module';
+import { VenuePhotoModule } from './venue_photo/venue_photo.module';
+import { SeatModule } from './seat/seat.module';
+import { CustomerCardModule } from './customer_card/customer_card.module';
+import { VenueTypesModule } from './venue_types/venue_types.module';
+import { CustomerAddressModule } from './customer_address/customer_address.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -33,6 +41,14 @@ import { MailModule } from './mail/mail.module';
     SeatTypeModule,
     CustomersModule,
     MailModule,
+    DistrictModule,
+    VenueModule,
+    VenuePhotoModule,
+    SeatModule,
+    CustomerCardModule,
+    VenueTypesModule,
+    CustomerAddressModule,
+    CartModule,
   ],
   controllers: [],
   providers: [],

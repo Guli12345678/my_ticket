@@ -15,7 +15,7 @@ export class SeatTypeService {
   }
 
   findAll() {
-    return this.seatTypeModel.find();
+    return this.seatTypeModel.find().populate("seat")
   }
 
   findOne(id: string) {

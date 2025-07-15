@@ -1,19 +1,19 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-import { Seat } from "../../seat/entities/seat.entity";
+import { Region } from "../../region/entities/region.entity";
 
-export type SeatTypeDocument = HydratedDocument<SeatType>;
+export type DistrictDocument = HydratedDocument<District>;
 
 @Schema({ versionKey: false, timestamps: false })
-export class SeatType {
+export class District {
   @Prop()
   name: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Seat",
+    ref: "Region",
   })
-  seat: Seat[];
+  region_id: Region;
 }
 
-export const SeatTypeSchema = SchemaFactory.createForClass(SeatType);
+export const DistrictSchema = SchemaFactory.createForClass(District);

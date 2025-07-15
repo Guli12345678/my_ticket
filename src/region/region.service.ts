@@ -15,7 +15,7 @@ export class RegionService {
   }
 
   findAll() {
-    return this.regionModel.find();
+    return this.regionModel.find().populate("districts");
   }
 
   findOne(id: string) {

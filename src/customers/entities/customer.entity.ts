@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { UUID } from "crypto";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
+import { CustomerCard } from "../../customer_card/entities/customer_card.entity";
+import { CustomerAddress } from "../../customer_address/entities/customer_address.entity";
 
 export type CustomerDocument = HydratedDocument<Customer>;
 
@@ -35,6 +37,22 @@ export class Customer {
 
   @Prop()
   activation_link: UUID;
+
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerCard",
+    },
+  ])
+  card: CustomerCard[];
+
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CustomerAddress",
+    },
+  ])
+  address: CustomerAddress[];
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

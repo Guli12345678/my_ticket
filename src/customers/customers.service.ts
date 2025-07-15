@@ -6,7 +6,6 @@ import { Customer } from "./entities/customer.entity";
 import { Model } from "mongoose";
 import * as bcrypt from "bcrypt";
 
-
 @Injectable()
 export class CustomersService {
   constructor(
@@ -26,7 +25,7 @@ export class CustomersService {
   }
 
   findAll() {
-    return this.customerModel.find();
+    return this.customerModel.find().populate("card").populate("address");
   }
 
   findOne(id: string) {
