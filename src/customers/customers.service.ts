@@ -25,7 +25,12 @@ export class CustomersService {
   }
 
   findAll() {
-    return this.customerModel.find().populate("card").populate("address");
+    return this.customerModel
+      .find()
+      .populate("cart")
+      .populate("bookings")
+      .populate("card")
+      .populate("address");
   }
 
   findOne(id: string) {

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  NotImplementedException,
 } from "@nestjs/common";
 import { CreateSeatDto } from "./dto/create-seat.dto";
 import { UpdateSeatDto } from "./dto/update-seat.dto";
@@ -26,8 +27,8 @@ export class SeatService {
     if (!isValidObjectId(seat_type_id)) {
       throw new BadRequestException("seat_type Id notogri");
     }
-    const venue = this.venueModel.findById(venue_id);
-    const seat_type = this.seatTypeModel.findById(seat_type_id);
+    const venue = await this.venueModel.findById(venue_id);
+    const seat_type = await this.seatTypeModel.findById(seat_type_id);
     if (!venue || !seat_type) {
       throw new NotFoundException("Bunday venue yoki seat_type topilmadi");
     }
@@ -45,15 +46,32 @@ export class SeatService {
     return this.seatModel.find().populate("venue_id").populate("seat_type_id");
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} seat`;
+  async findOne(id: string) {
+    const seat = await this.seatModel
+      .findById(id)
+      .populate("venue_id")
+      .populate("seat_type_id");
+    if (!seat) {
+      throw new NotFoundException("Seat not found");
+    }
+    return seat;
   }
 
-  update(id: number, updateSeatDto: UpdateSeatDto) {
-    return `This action updates a #${id} seat`;
+  async update(id: string, updateSeatDto: UpdateSeatDto) {
+    const seat = await this.seatModel.findByIdAndUpdate(id, updateSeatDto, {
+      new: true,
+    });
+    if (!seat) {
+      throw new NotFoundException("Seat not found");
+    }
+    return seat;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} seat`;
+  async remove(id: string) {
+    const seat = await this.seatModel.findByIdAndDelete(id);
+    if (!seat) {
+      throw new NotFoundException("Seat not found");
+    }
+    return seat;
   }
 }

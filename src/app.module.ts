@@ -21,6 +21,10 @@ import { CustomerCardModule } from './customer_card/customer_card.module';
 import { VenueTypesModule } from './venue_types/venue_types.module';
 import { CustomerAddressModule } from './customer_address/customer_address.module';
 import { CartModule } from './cart/cart.module';
+import { BookingModule } from './booking/booking.module';
+import { EventTypeModule } from './event_type/event_type.module';
+import { EventModule } from './event/event.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -49,6 +53,10 @@ import { CartModule } from './cart/cart.module';
     VenueTypesModule,
     CustomerAddressModule,
     CartModule,
+    BookingModule,
+    EventTypeModule,
+    EventModule,
+    TicketModule,
   ],
   controllers: [],
   providers: [],

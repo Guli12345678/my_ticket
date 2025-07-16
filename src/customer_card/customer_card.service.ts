@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotImplementedException,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateCustomerCardDto } from "./dto/create-customer_card.dto";
 import { UpdateCustomerCardDto } from "./dto/update-customer_card.dto";
 import { InjectModel } from "@nestjs/mongoose";
@@ -35,15 +40,33 @@ export class CustomerCardService {
     return this.customerCardModel.find().populate("customer_id");
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customerCard`;
+  async findOne(id: string) {
+    const card = await this.customerCardModel
+      .findById(id)
+      .populate("customer_id");
+    if (!card) {
+      throw new NotFoundException("Customer card not found");
+    }
+    return card;
   }
 
-  update(id: number, updateCustomerCardDto: UpdateCustomerCardDto) {
-    return `This action updates a #${id} customerCard`;
+  async update(id: string, updateCustomerCardDto: UpdateCustomerCardDto) {
+    const card = await this.customerCardModel.findByIdAndUpdate(
+      id,
+      updateCustomerCardDto,
+      { new: true }
+    );
+    if (!card) {
+      throw new NotFoundException("Customer card not found");
+    }
+    return card;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customerCard`;
+  async remove(id: string) {
+    const card = await this.customerCardModel.findByIdAndDelete(id);
+    if (!card) {
+      throw new NotFoundException("Customer card not found");
+    }
+    return card;
   }
 }

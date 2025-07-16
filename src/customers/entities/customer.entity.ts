@@ -3,6 +3,8 @@ import { UUID } from "crypto";
 import mongoose, { HydratedDocument } from "mongoose";
 import { CustomerCard } from "../../customer_card/entities/customer_card.entity";
 import { CustomerAddress } from "../../customer_address/entities/customer_address.entity";
+import { Cart } from "../../cart/entities/cart.entity";
+import { Booking } from "../../booking/entities/booking.entity";
 
 export type CustomerDocument = HydratedDocument<Customer>;
 
@@ -45,6 +47,11 @@ export class Customer {
     },
   ])
   card: CustomerCard[];
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cart",
+  })
+  cart: Cart;
 
   @Prop([
     {
@@ -53,6 +60,13 @@ export class Customer {
     },
   ])
   address: CustomerAddress[];
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+    },
+  ])
+  bookings: Booking[];
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

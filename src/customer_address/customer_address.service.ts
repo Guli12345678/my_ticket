@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  NotImplementedException,
 } from "@nestjs/common";
 import { CreateCustomerAddressDto } from "./dto/create-customer_address.dto";
 import { UpdateCustomerAddressDto } from "./dto/update-customer_address.dto";
@@ -39,12 +40,8 @@ export class CustomerAddressService {
     if (!customer) {
       throw new NotFoundException("Bunday customer yoq");
     }
-    const region = this.regionModel.findById(region_id);
-
-
-
-    
-    const district = this.districtModel.findById(district_id);
+    const region = await this.regionModel.findById(region_id);
+    const district = await this.districtModel.findById(district_id);
     if (!region || !district) {
       throw new NotFoundException("Bunday region yoki district topilmadi");
     }
@@ -65,15 +62,35 @@ export class CustomerAddressService {
       .populate("district_id");
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customerAddress`;
+  async findOne(id: string) {
+    const address = await this.customerAddressModel
+      .findById(id)
+      .populate("customer_id")
+      .populate("region_id")
+      .populate("district_id");
+    if (!address) {
+      throw new NotFoundException("Customer address not found");
+    }
+    return address;
   }
 
-  update(id: number, updateCustomerAddressDto: UpdateCustomerAddressDto) {
-    return `This action updates a #${id} customerAddress`;
+  async update(id: string, updateCustomerAddressDto: UpdateCustomerAddressDto) {
+    const address = await this.customerAddressModel.findByIdAndUpdate(
+      id,
+      updateCustomerAddressDto,
+      { new: true }
+    );
+    if (!address) {
+      throw new NotFoundException("Customer address not found");
+    }
+    return address;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customerAddress`;
+  async remove(id: string) {
+    const address = await this.customerAddressModel.findByIdAndDelete(id);
+    if (!address) {
+      throw new NotFoundException("Customer address not found");
+    }
+    return address;
   }
 }

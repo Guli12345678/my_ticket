@@ -11,7 +11,6 @@ import { isValidObjectId, Model } from "mongoose";
 import { Venue } from "../venue/entities/venue.entity";
 
 @Injectable()
-
 export class VenuePhotoService {
   constructor(
     @InjectModel(VenuePhoto.name) private venuePhotoModel: Model<VenuePhoto>,
@@ -37,15 +36,33 @@ export class VenuePhotoService {
     return this.venuePhotoModel.find().populate("venue_id");
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} venuePhoto`;
+  async findOne(id: string) {
+    const venuePhoto = await this.venuePhotoModel
+      .findById(id)
+      .populate("venue_id");
+    if (!venuePhoto) {
+      throw new NotFoundException("Venue photo not found");
+    }
+    return venuePhoto;
   }
 
-  update(id: number, updateVenuePhotoDto: UpdateVenuePhotoDto) {
-    return `This action updates a #${id} venuePhoto`;
+  async update(id: string, updateVenuePhotoDto: UpdateVenuePhotoDto) {
+    const venuePhoto = await this.venuePhotoModel.findByIdAndUpdate(
+      id,
+      updateVenuePhotoDto,
+      { new: true }
+    );
+    if (!venuePhoto) {
+      throw new NotFoundException("Venue photo not found");
+    }
+    return venuePhoto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} venuePhoto`;
+  async remove(id: string) {
+    const venuePhoto = await this.venuePhotoModel.findByIdAndDelete(id);
+    if (!venuePhoto) {
+      throw new NotFoundException("Venue photo not found");
+    }
+    return venuePhoto;
   }
 }

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  NotImplementedException,
 } from "@nestjs/common";
 import { CreateVenueDto } from "./dto/create-venue.dto";
 import { UpdateVenueDto } from "./dto/update-venue.dto";
@@ -27,8 +28,8 @@ export class VenueService {
     if (!isValidObjectId(district_id)) {
       throw new BadRequestException("District Id notogri");
     }
-    const region = this.regionSchema.findById(region_id);
-    const district = this.regionSchema.findById(district_id);
+    const region = await this.regionSchema.findById(region_id);
+    const district = await this.districtSchema.findById(district_id);
     if (!region || !district) {
       throw new NotFoundException("Bunday region yoki district topilmadi");
     }
@@ -41,20 +42,41 @@ export class VenueService {
       .find()
       .populate("venue_photo")
       .populate("type")
+      .populate("events")
       .populate("seat")
       .populate("region_id")
       .populate("district_id");
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} venue`;
+  async findOne(id: string) {
+    const venue = await this.venueSchema
+      .findById(id)
+      .populate("venue_photo")
+      .populate("type")
+      .populate("seat")
+      .populate("region_id")
+      .populate("district_id");
+    if (!venue) {
+      throw new NotFoundException("Venue not found");
+    }
+    return venue;
   }
 
-  update(id: number, updateVenueDto: UpdateVenueDto) {
-    return `This action updates a #${id} venue`;
+  async update(id: string, updateVenueDto: UpdateVenueDto) {
+    const venue = await this.venueSchema.findByIdAndUpdate(id, updateVenueDto, {
+      new: true,
+    });
+    if (!venue) {
+      throw new NotFoundException("Venue not found");
+    }
+    return venue;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} venue`;
+  async remove(id: string) {
+    const venue = await this.venueSchema.findByIdAndDelete(id);
+    if (!venue) {
+      throw new NotFoundException("Venue not found");
+    }
+    return venue;
   }
 }

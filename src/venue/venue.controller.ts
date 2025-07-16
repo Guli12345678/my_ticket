@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { VenueService } from './venue.service';
-import { CreateVenueDto } from './dto/create-venue.dto';
-import { UpdateVenueDto } from './dto/update-venue.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
+import { VenueService } from "./venue.service";
+import { CreateVenueDto } from "./dto/create-venue.dto";
+import { UpdateVenueDto } from "./dto/update-venue.dto";
 
-@Controller('venue')
+@Controller("venue")
 export class VenueController {
   constructor(private readonly venueService: VenueService) {}
 
@@ -17,18 +25,18 @@ export class VenueController {
     return this.venueService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.venueService.findOne(+id);
+  @Get(":id")
+  findOne(@Param("id") id: string) {
+    return this.venueService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVenueDto: UpdateVenueDto) {
-    return this.venueService.update(+id, updateVenueDto);
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() updateVenueDto: UpdateVenueDto) {
+    return this.venueService.update(id, updateVenueDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.venueService.remove(+id);
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.venueService.remove(id);
   }
 }

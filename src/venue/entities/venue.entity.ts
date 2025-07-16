@@ -55,6 +55,12 @@ export class Venue {
     default: [],
   })
   type: Types.ObjectId[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
+    default: [],
+  })
+  events: Types.ObjectId[];
 }
 
 export const VenueSchema = SchemaFactory.createForClass(Venue);
