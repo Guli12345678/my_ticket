@@ -1,6 +1,7 @@
 import { Schema, SchemaFactory, Prop } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 import * as mongoose from "mongoose";
+import { CartItem } from "../../cart_item/entities/cart_item.entity";
 
 export type CartDocument = HydratedDocument<Cart>;
 
@@ -17,9 +18,16 @@ export class Cart {
   finishedAt: string;
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: "TicketStatus"
+    ref: "TicketStatus",
   })
   status_id: mongoose.Schema.Types.ObjectId;
+  @Prop([
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CartItem",
+    },
+  ])
+  items: CartItem[];
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

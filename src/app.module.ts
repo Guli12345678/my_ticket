@@ -25,6 +25,7 @@ import { BookingModule } from './booking/booking.module';
 import { EventTypeModule } from './event_type/event_type.module';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
+import { CartItemModule } from './cart_item/cart_item.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { TicketModule } from './ticket/ticket.module';
     EventTypeModule,
     EventModule,
     TicketModule,
+    CartItemModule,
   ],
   controllers: [],
   providers: [],

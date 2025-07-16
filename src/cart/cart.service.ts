@@ -42,7 +42,7 @@ export class CartService {
   }
 
   findAll() {
-    return this.cartModel.find().populate("status_id");
+    return this.cartModel.find().populate("status_id").populate("items");
   }
 
   findOne(id: number) {
